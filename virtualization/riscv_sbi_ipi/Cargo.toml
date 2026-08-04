@@ -1,0 +1,12 @@
+[package]
+name = "riscv_sbi_ipi"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+description = "Pure helper logic for RISC-V legacy SBI IPI and virtual interrupt contracts"
+repository.workspace = true
+categories = ["embedded", "no-std"]
+keywords = ["hypervisor", "riscv", "sbi", "ipi"]
+license.workspace = true
+
+[dependencies]

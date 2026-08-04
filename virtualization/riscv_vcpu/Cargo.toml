@@ -1,6 +1,6 @@
 [package]
 name = "riscv_vcpu"
-version = "0.5.18"
+version = "0.5.19"
 edition.workspace = true
 authors = [
     "KeYang Hu <keyang.hu@qq.com>",
@@ -34,3 +34,4 @@ sbi-spec = { version = "0.0.9", features = ["legacy"] }
 thiserror = { workspace = true }
 tock-registers = "0.10"
 memoffset = { version = ">=0.6.5", features = ["unstable_const"] }
+riscv_sbi_ipi = { version = "0.1.0", path = "../riscv_sbi_ipi" }
