@@ -24,7 +24,7 @@ fn assert_in_order(source: &str, operations: &[&str]) {
 
 #[test]
 fn vm_exit_restores_host_anchors_before_returning_to_rust() {
-    let exit = section(TRAP_ASSEMBLY, "_guest_exit:", "ret");
+    let exit = section(TRAP_ASSEMBLY, "_guest_exit:", "\n    ret");
     assert_in_order(
         exit,
         &[
@@ -58,6 +58,35 @@ fn vm_exit_restores_host_anchors_before_returning_to_rust() {
             "missing typed offset {binding:?}"
         );
     }
+}
+
+#[test]
+fn vm_exit_restores_host_stvec_before_host_sstatus() {
+    // Keep the defensive restore order explicit; run() owns the interrupt
+    // enable and only re-enables SIE after this sequence returns.
+    let restore = section(TRAP_ASSEMBLY, "_restore_csrs:", "/* Save guest EPC. */");
+    assert_in_order(
+        restore,
+        &[
+            "ld    t1, ({hyp_stvec})(a0)",
+            "csrw  stvec, t1",
+            "ld    t1, ({hyp_sstatus})(a0)",
+            "csrrw t1, sstatus, t1",
+        ],
+    );
+}
+
+#[test]
+fn run_keeps_host_interrupts_disabled_across_world_switch() {
+    let run = section(VCPU, "pub fn run(", "self.vmexit_handler()");
+    assert_in_order(
+        run,
+        &[
+            "sstatus::clear_sie()",
+            "_run_guest(&mut self.regs)",
+            "sstatus::set_sie()",
+        ],
+    );
 }
 
 #[test]
